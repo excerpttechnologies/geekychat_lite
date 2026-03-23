@@ -31,6 +31,16 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
+
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Fallback route for SPA (React Router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+
+
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth',  require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));

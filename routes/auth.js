@@ -6,10 +6,10 @@ const { generateToken, protect } = require('../middleware/auth');
 // ─── Seed default admin on startup ───────────────────────────────────────────
 const seedAdmin = async () => {
   try {
-    const exists = await User.findOne({ email: 'Excerptech@geekychat.com' });
+    const exists = await User.findOne({ email: 'excerptech@geekychat.com' });
     if (!exists) {
       const admin = new User({
-        email: 'Excerptech@geekychat.com',
+        email: 'excerptech@geekychat.com',
         password: 'ExcerptGeekychat#2026', // will be hashed by pre-save hook
         name: 'Admin',
         role: 'admin'
