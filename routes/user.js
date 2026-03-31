@@ -203,6 +203,8 @@ router.post('/wa/send-message', async (req, res) => {
 
 
 
+
+
 // ────────────────────────────────────────
 // POST /api/user/campaigns/batch — save batch after sending
 // ────────────────────────────────────────
@@ -448,6 +450,44 @@ router.post('/campaigns/update-status', async (req, res) => {
     const axios = require('axios');
     const response = await axios.post('https://geekychat.in/api/campaigns/update-status');
     res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+
+// ── GET /api/user/campaigns/:id/status — frontend polls this ────────────────
+router.get('/campaigns/:id/status', async (req, res) => {
+  try {
+    const campaign = await Campaign.findOne({
+      _id:    req.params.id,
+      userId: req.user._id
+    });
+
+    if (!campaign) {
+      return res.status(404).json({ success: false, message: 'Campaign not found' });
+    }
+
+    const all       = campaign.messageDetails || [];
+    const sent      = all.filter(m => ['sent','delivered','read'].includes(m.status)).length;
+    const failed    = all.filter(m => m.status === 'failed').length;
+    const delivered = all.filter(m => ['delivered','read'].includes(m.status)).length;
+    const read      = all.filter(m => m.status === 'read').length;
+
+    res.json({
+      success: true,
+      data: {
+        status:         campaign.status,
+        messageDetails: all,
+        stats: {
+          total:     all.length,
+          sent,
+          failed,
+          delivered,
+          read
+        }
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
